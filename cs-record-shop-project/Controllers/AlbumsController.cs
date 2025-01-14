@@ -1,4 +1,4 @@
-﻿using cs_record_shop_project.Service;
+﻿using cs_record_shop_project.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cs_record_shop_project.Controllers;
@@ -19,5 +19,6 @@ public class AlbumsController : ControllerBase
     {
         var albums = albumService.GetAllAlbums();
         return Ok(albums);
+
     }
 }

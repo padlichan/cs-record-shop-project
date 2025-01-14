@@ -1,10 +1,12 @@
-﻿namespace cs_record_shop_project.Model;
+﻿using cs_record_shop_project.Models;
 
-public class AlbumModel : IAlbumModel
+namespace cs_record_shop_project.Repositories;
+
+public class AlbumRepository : IAlbumRepository
 {
     private RecordShopDbContext recordShopDb;
 
-    public AlbumModel(RecordShopDbContext recordShopDb)
+    public AlbumRepository(RecordShopDbContext recordShopDb)
     {
         this.recordShopDb = recordShopDb;
     }

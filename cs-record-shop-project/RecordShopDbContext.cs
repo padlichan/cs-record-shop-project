@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using cs_record_shop_project.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace cs_record_shop_project
 {

@@ -1,6 +1,6 @@
 using cs_record_shop_project;
-using cs_record_shop_project.Model;
-using cs_record_shop_project.Service;
+using cs_record_shop_project.Repositories;
+using cs_record_shop_project.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +25,7 @@ else
 }
 
 builder.Services.AddScoped<IAlbumService, AlbumService>();
-builder.Services.AddScoped<IAlbumModel, AlbumModel>();
+builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
 
 var app = builder.Build();
 
