@@ -14,4 +14,16 @@ public class AlbumRepository : IAlbumRepository
     {
         return recordShopDb.Albums.ToList();
     }
+
+    public Album AddAlbum(AlbumDto albumDto)
+    {
+        recordShopDb.Albums.Add(new Album(albumDto));
+        recordShopDb.SaveChanges();
+        return recordShopDb.Albums.Last();
+    }
+
+    public Album? GetAlbumById(int id)
+    {
+        return recordShopDb.Albums.FirstOrDefault(album => album.Id == id);
+    }
 }
