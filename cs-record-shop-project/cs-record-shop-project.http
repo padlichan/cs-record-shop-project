@@ -1,0 +1,6 @@
+@cs_record_shop_project_HostAddress = http://localhost:5293
+
+GET {{cs_record_shop_project_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
