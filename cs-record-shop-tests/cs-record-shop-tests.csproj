@@ -25,10 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ServiceTests\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\cs-record-shop-project\cs-record-shop-project.csproj" />
   </ItemGroup>
 

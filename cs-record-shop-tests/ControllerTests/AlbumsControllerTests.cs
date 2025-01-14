@@ -56,6 +56,5 @@ namespace cs_record_shop_tests.ControllerTests
             //Assert
             result.Should().NotBeNull();
         }
-
     }
 }
