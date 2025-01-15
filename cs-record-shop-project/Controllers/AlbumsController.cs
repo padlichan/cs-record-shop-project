@@ -1,6 +1,7 @@
 ﻿using cs_record_shop_project.Services;
 using cs_record_shop_project.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 
 namespace cs_record_shop_project.Controllers;
 
@@ -20,7 +21,6 @@ public class AlbumsController : ControllerBase
     {
         var albums = albumService.GetAllAlbums();
         return Ok(albums.Data);
-
     }
 
     [HttpGet]
@@ -39,8 +39,8 @@ public class AlbumsController : ControllerBase
         var addedAlbumResult = albumService.AddAlbum(albumDto);
         if (addedAlbumResult.IsSuccess) return Ok(addedAlbumResult.Data);
         return BadRequest(addedAlbumResult.ErrorMessage);
-
     }
+
     [HttpPut]
     [Route("{id}")]
     public IActionResult PutAlbum(int id, AlbumDto albumDto)
@@ -50,4 +50,12 @@ public class AlbumsController : ControllerBase
         return NotFound(AlbumService.NOT_FOUND_ERROR_MESSAGE);
     }
 
+    [HttpDelete]
+    [Route("{id}")]
+    public IActionResult DeleteAlbum(int id)
+    {
+        ServiceResult<Album> deletedAlbumResult = albumService.DeleteAlbum(id);
+        if(deletedAlbumResult.IsSuccess) return NoContent();
+        else return NotFound(deletedAlbumResult.ErrorMessage);
+    }
 }

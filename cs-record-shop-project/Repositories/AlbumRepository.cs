@@ -36,4 +36,13 @@ public class AlbumRepository : IAlbumRepository
         recordShopDb.SaveChanges();
         return albumToUpdate;
     }
+
+    public bool DeleteAlbum(int id)
+    {
+        var albumToDelete = recordShopDb.Albums.FirstOrDefault(a =>a.Id == id); 
+        if(albumToDelete == null) return false;
+        recordShopDb.Albums.Remove(albumToDelete);
+        recordShopDb.SaveChanges();
+        return true;
+    }
 }

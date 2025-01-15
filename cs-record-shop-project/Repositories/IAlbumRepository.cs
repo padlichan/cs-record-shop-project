@@ -8,4 +8,5 @@ public interface IAlbumRepository
     Album AddAlbum(AlbumDto albumDto);
     Album? GetAlbumById(int id);
     Album? UpdateAlbum(int id, AlbumDto albumDto);
+    bool DeleteAlbum(int id);
 }

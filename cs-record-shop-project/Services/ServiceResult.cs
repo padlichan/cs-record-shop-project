@@ -13,6 +13,6 @@ public class ServiceResult<T>
     public T? Data { get; set; }
     public string? ErrorMessage { get; set; }
 
-    public static ServiceResult<T> Success(T data) => new ServiceResult<T>(true, data);
+    public static ServiceResult<T> Success(T? data) => new ServiceResult<T>(true, data);
     public static ServiceResult<T> Error(string errorMessage) => new ServiceResult<T>(false, default, errorMessage);
 }
