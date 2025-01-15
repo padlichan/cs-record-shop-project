@@ -5,6 +5,7 @@ namespace cs_record_shop_project.Services;
 
 public class AlbumService : IAlbumService
 {
+    public const string NOT_FOUND_ERROR_MESSAGE = "Album not found.";
     private IAlbumRepository albumRepo;
 
     public AlbumService(IAlbumRepository albumRepo)
@@ -12,18 +13,26 @@ public class AlbumService : IAlbumService
         this.albumRepo = albumRepo;
     }
 
-    public List<Album> GetAllAlbums()
+    public ServiceResult<List<Album>> GetAllAlbums()
     {
-        return albumRepo.GetAllAlbums();
+        return ServiceResult<List<Album>>.Success(albumRepo.GetAllAlbums());
     }
 
-    public Album AddAlbum(AlbumDto albumDto)
+    public ServiceResult<Album> AddAlbum(AlbumDto albumDto)
     {
-        return albumRepo.AddAlbum(albumDto);
+        return ServiceResult<Album>.Success( albumRepo.AddAlbum(albumDto));
     }
 
-    public Album? GetAlbumById(int id)
+    public ServiceResult<Album?> GetAlbumById(int id)
     {
-        return albumRepo.GetAlbumById(id);
+        Album? album = albumRepo.GetAlbumById(id);
+        if (album == null) return ServiceResult<Album?>.Error(NOT_FOUND_ERROR_MESSAGE);
+        return ServiceResult<Album?>.Success(album);
+    }
+
+    public ServiceResult<Album?> UpdateAlbum(AlbumDto albumDto)
+    {
+        var updatedAlbum = albumRepo.UpdateAlbum(albumDto);
+        return ServiceResult<Album?>.Success(new Album(albumDto));
     }
 }

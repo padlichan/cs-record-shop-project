@@ -26,4 +26,9 @@ public class AlbumRepository : IAlbumRepository
     {
         return recordShopDb.Albums.FirstOrDefault(album => album.Id == id);
     }
+
+    public object UpdateAlbum(AlbumDto albumDto)
+    {
+        return new Album(albumDto);
+    }
 }

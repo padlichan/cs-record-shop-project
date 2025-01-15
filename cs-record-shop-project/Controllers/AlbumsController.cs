@@ -28,9 +28,9 @@ public class AlbumsController : ControllerBase
 
     public IActionResult GetAlbumById(int id)
     {
-        Album? albumById = albumService.GetAlbumById(id);
-        if(albumById == null) return NotFound();
-        return Ok(albumById);
+        var AlbumByIdResult = albumService.GetAlbumById(id);
+        if(AlbumByIdResult.IsSuccess) return Ok(AlbumByIdResult.Data);
+        return NotFound(AlbumByIdResult.ErrorMessage);
     }
 
     [HttpPost]
@@ -38,6 +38,14 @@ public class AlbumsController : ControllerBase
     {
         var addedAlbum = albumService.AddAlbum(albumDto);
         return Ok(addedAlbum);
+    }
+
+    [HttpPost]
+    public IActionResult PutAlbum(AlbumDto albumDto)
+    {
+        var updatedAlbumResult = albumService.UpdateAlbum(albumDto);
+        if(updatedAlbumResult.IsSuccess) return Ok(updatedAlbumResult.Data);
+        return NotFound();
     }
     
 }

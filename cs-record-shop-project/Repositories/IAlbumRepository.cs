@@ -6,5 +6,6 @@ public interface IAlbumRepository
 {
     List<Album> GetAllAlbums();
     Album AddAlbum(AlbumDto albumDto);
-    Album? GetAlbumById(int id); 
+    Album? GetAlbumById(int id);
+    object UpdateAlbum(AlbumDto albumDto);
 }

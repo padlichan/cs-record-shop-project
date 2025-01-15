@@ -34,7 +34,7 @@ namespace cs_record_shop_tests.ControllerTests
         {
             //Assign
             List<Album> albums = [album1];
-            albumService.Setup(m => m.GetAllAlbums()).Returns(albums);
+            albumService.Setup(m => m.GetAllAlbums()).Returns(ServiceResult<List<Album>>.Success(albums));
 
             //Act
             var ObjectResult = albumsController.GetAllAlbums() as OkObjectResult;
@@ -49,7 +49,7 @@ namespace cs_record_shop_tests.ControllerTests
         {
             //Assign
             List<Album> albums = [album1];
-            albumService.Setup(m => m.GetAllAlbums()).Returns(albums);
+            albumService.Setup(m => m.GetAllAlbums()).Returns(ServiceResult<List<Album>>.Success(albums));
 
             //Act
             var result = albumsController.GetAllAlbums() as OkObjectResult;
@@ -76,7 +76,7 @@ namespace cs_record_shop_tests.ControllerTests
         [Test]
         public void PostAlbum_ReturnsAddedAlbum()
         {
-            albumService.Setup(a => a.AddAlbum(albumDto1)).Returns(album1);
+            albumService.Setup(a => a.AddAlbum(albumDto1)).Returns(ServiceResult<Album>.Success(album1));
             var resultObject = albumsController.PostAlbum(albumDto1) as OkObjectResult;
             var result = resultObject?.Value;
             result.Should().Be(album1);
@@ -93,7 +93,7 @@ namespace cs_record_shop_tests.ControllerTests
         [Test]
         public void GetAlbumById_ReturnsCorrectAlbumForValidId()
         {
-            albumService.Setup(a => a.GetAlbumById(1)).Returns(album1);
+            albumService.Setup(a => a.GetAlbumById(1)).Returns(ServiceResult<Album?>.Success(album1));
 
             var resultObject = albumsController.GetAlbumById(1) as OkObjectResult;
             var result = resultObject?.Value;
@@ -104,7 +104,7 @@ namespace cs_record_shop_tests.ControllerTests
         public void GetAlbumById_ReturnsOkObjectResultForValidId()
         {
             int validId = 1;
-            albumService.Setup(a => a.GetAlbumById(validId)).Returns(album1);
+            albumService.Setup(a => a.GetAlbumById(validId)).Returns(ServiceResult<Album?>.Success(album1));
 
             var result = albumsController.GetAlbumById(validId);
             result.Should().BeOfType<OkObjectResult>();
@@ -113,7 +113,8 @@ namespace cs_record_shop_tests.ControllerTests
         public void GetAlbumById_ReturnsNotFoundForInvalidId()
         {
             int invalidId = 5; 
-            albumService.Setup(a => a.GetAlbumById(invalidId)).Returns<Album>(null!);
+            var serviceReturnValue = ServiceResult<Album?>.Error(AlbumService.NOT_FOUND_ERROR_MESSAGE);
+            albumService.Setup(a => a.GetAlbumById(invalidId)).Returns(serviceReturnValue);
             var result = albumsController.GetAlbumById(invalidId);
 
             result.Should().BeOfType<NotFoundResult>();
