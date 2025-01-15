@@ -10,14 +10,18 @@ internal class AlbumServiceTests
 {
     private AlbumService albumService;
     private Mock<IAlbumRepository> albumRepo;
-    private Album album1 = new Album("testTitle", "testDescription");
-    private AlbumDto albumDto1 = new AlbumDto("testTitle", "testDescription");
+    private AlbumInputDto albumInputDto1 = new AlbumInputDto("testTitle", "testDescription", 2000, 1);
+    AlbumInputDto newAlbumInputDto = new AlbumInputDto("newTitle", "newDescription", 2000, 1);
+    private Album album1;
+    Album updatedAlbum;
     private int validId = 1;
     private int invalidId = 5;
 
     [SetUp]
     public void Setup()
     {
+        updatedAlbum = new Album(newAlbumInputDto);
+        album1 = new Album(albumInputDto1);
         albumRepo = new Mock<IAlbumRepository>();
         albumService = new AlbumService(albumRepo.Object);
     }
@@ -32,7 +36,7 @@ internal class AlbumServiceTests
     [Test]
     public void GetAllAlbums_ReturnsCorrectAlbums()
     {
-        List<Album> albums = [new Album("testTitle", "testDescription")];
+        List<Album> albums = [album1];
         albumRepo.Setup(a => a.GetAllAlbums()).Returns(albums);
         var result = albumService.GetAllAlbums();
 
@@ -44,10 +48,10 @@ internal class AlbumServiceTests
     [Test]
     public void AddAlbum_ReturnsAddedAlbum()
     {
-        var albumDto = new AlbumDto("testTitle", "testDescription");
-        albumRepo.Setup(a => a.AddAlbum(albumDto)).Returns(album1);
+        
+        albumRepo.Setup(a => a.AddAlbum(albumInputDto1)).Returns(album1);
 
-        var result = albumService.AddAlbum(albumDto);
+        var result = albumService.AddAlbum(albumInputDto1);
 
         result.IsSuccess.Should().BeTrue();
         result.Data.Should().BeEquivalentTo(album1);
@@ -56,10 +60,9 @@ internal class AlbumServiceTests
     [Test]
     public void AddAlbum_CallsCorrectRepositoryMethod()
     {
-        var albumDto = new AlbumDto("testTitle", "testDescription");
-        var result = albumService.AddAlbum(albumDto);
+        var result = albumService.AddAlbum(albumInputDto1);
 
-        albumRepo.Verify(a => a.AddAlbum(albumDto), Times.Once);
+        albumRepo.Verify(a => a.AddAlbum(albumInputDto1), Times.Once);
     }
 
     [Test]
@@ -96,19 +99,19 @@ internal class AlbumServiceTests
     [Test]
     public void UpdateAlbum_CallsCorrectRepositoryMethod()
     {
-        albumRepo.Setup(a => a.UpdateAlbum(validId, albumDto1)).Returns(album1);
+        albumRepo.Setup(a => a.UpdateAlbum(validId, albumInputDto1)).Returns(album1);
 
-        albumService.UpdateAlbum(validId, albumDto1);
+        albumService.UpdateAlbum(validId, albumInputDto1);
 
-        albumRepo.Verify(a => a.UpdateAlbum(validId, albumDto1), Times.Once);
+        albumRepo.Verify(a => a.UpdateAlbum(validId, albumInputDto1), Times.Once);
     }
 
     [Test]
     public void UpdateAlbum_ReturnsSuccessForValidId()
     {
-        albumRepo.Setup(a => a.UpdateAlbum(validId, albumDto1)).Returns(album1);
+        albumRepo.Setup(a => a.UpdateAlbum(validId, albumInputDto1)).Returns(album1);
 
-        var result = albumService.UpdateAlbum(validId, albumDto1);
+        var result = albumService.UpdateAlbum(validId, albumInputDto1);
 
         result.IsSuccess.Should().BeTrue();
     }
@@ -116,10 +119,9 @@ internal class AlbumServiceTests
     [Test]
     public void UpdateAlbum_ReturnsUpdatedAlbumForValidId()
     {
-        Album updatedAlbum = new Album("updatedTitle", "updatedDescription");
-        albumRepo.Setup(a => a.UpdateAlbum(validId, albumDto1)).Returns(updatedAlbum);
+        albumRepo.Setup(a => a.UpdateAlbum(validId, newAlbumInputDto)).Returns(updatedAlbum);
 
-        var result = albumService.UpdateAlbum(validId, albumDto1);
+        var result = albumService.UpdateAlbum(validId, newAlbumInputDto);
 
         result.Data.Should().BeEquivalentTo(updatedAlbum);
     }
@@ -127,9 +129,9 @@ internal class AlbumServiceTests
     [Test]
     public void UpdateAlbum_ReturnsErrorForInvalidId()
     {
-        albumRepo.Setup(a => a.UpdateAlbum(invalidId, albumDto1)).Returns<Album?>(null!);
+        albumRepo.Setup(a => a.UpdateAlbum(invalidId, albumInputDto1)).Returns<Album?>(null!);
 
-        var result = albumService.UpdateAlbum(invalidId, albumDto1);
+        var result = albumService.UpdateAlbum(invalidId, albumInputDto1);
 
         result.IsSuccess.Should().BeFalse();
         result.Data.Should().BeNull();

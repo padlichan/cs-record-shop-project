@@ -1,4 +1,3 @@
-using cs_record_shop_project;
 using cs_record_shop_project.Repositories;
 using cs_record_shop_project.Services;
 using Microsoft.EntityFrameworkCore;
@@ -7,21 +6,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-var environment = builder.Environment.EnvironmentName;
-if(environment == "Development")
+if(builder.Environment.IsDevelopment())
 {
-    builder.Services.AddDbContext<RecordShopDbContext>(options => options.UseInMemoryDatabase("InMemoryDb")); 
+    //builder.Services.AddDbContext<RecordShopDbContext>(options => options.UseInMemoryDatabase("InMemoryDb"));
+    var connectionString = builder.Configuration.GetConnectionString("RecordShopDatabase");
+    builder.Services.AddDbContext<RecordShopDbContext>(options => options.UseSqlServer(connectionString));
 }
 else
 {
-    var connectionString = builder.Configuration.GetConnectionString("AdventurersDatabase");
+    var connectionString = builder.Configuration.GetConnectionString("RecordShopDatabase");
     builder.Services.AddDbContext<RecordShopDbContext>(options => options.UseSqlServer(connectionString));
+    Console.WriteLine("Using actual database");
 }
 
 builder.Services.AddScoped<IAlbumService, AlbumService>();

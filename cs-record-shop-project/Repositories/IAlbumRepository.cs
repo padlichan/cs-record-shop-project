@@ -5,8 +5,8 @@ namespace cs_record_shop_project.Repositories;
 public interface IAlbumRepository
 {
     List<Album> GetAllAlbums();
-    Album AddAlbum(AlbumDto albumDto);
+    Album AddAlbum(AlbumInputDto albumDto);
     Album? GetAlbumById(int id);
-    Album? UpdateAlbum(int id, AlbumDto albumDto);
+    Album? UpdateAlbum(int id, AlbumInputDto albumDto);
     bool DeleteAlbum(int id);
 }

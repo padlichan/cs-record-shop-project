@@ -19,8 +19,13 @@ public class AlbumsController : ControllerBase
     [HttpGet]
     public IActionResult GetAllAlbums()
     {
-        var albums = albumService.GetAllAlbums();
-        return Ok(albums.Data);
+        var albumsResult = albumService.GetAllAlbums();
+        if (albumsResult.IsSuccess && albumsResult.Data != null)
+        {
+            var output = albumsResult.Data!.Select(a => new AlbumOutputDto(a)).ToList();
+            return Ok(output);
+        }
+        return BadRequest();
     }
 
     [HttpGet]
@@ -29,24 +34,36 @@ public class AlbumsController : ControllerBase
     public IActionResult GetAlbumById(int id)
     {
         var AlbumByIdResult = albumService.GetAlbumById(id);
-        if (AlbumByIdResult.IsSuccess) return Ok(AlbumByIdResult.Data);
+        if (AlbumByIdResult.IsSuccess && AlbumByIdResult.Data != null)
+        {
+            var output = new AlbumOutputDto(AlbumByIdResult.Data);
+            return Ok(output);
+        }
         return NotFound(AlbumByIdResult.ErrorMessage);
     }
 
     [HttpPost]
-    public IActionResult PostAlbum(AlbumDto albumDto)
+    public IActionResult PostAlbum(AlbumInputDto albumDto)
     {
         var addedAlbumResult = albumService.AddAlbum(albumDto);
-        if (addedAlbumResult.IsSuccess) return Ok(addedAlbumResult.Data);
+        if (addedAlbumResult.IsSuccess && addedAlbumResult.Data != null)
+        {
+            AlbumOutputDto output = new AlbumOutputDto(addedAlbumResult.Data);
+            return Ok(output);
+        }
         return BadRequest(addedAlbumResult.ErrorMessage);
     }
 
     [HttpPut]
     [Route("{id}")]
-    public IActionResult PutAlbum(int id, AlbumDto albumDto)
+    public IActionResult PutAlbum(int id, AlbumInputDto albumDto)
     {
         var updatedAlbumResult = albumService.UpdateAlbum(id, albumDto);
-        if (updatedAlbumResult.IsSuccess) return Ok(updatedAlbumResult.Data);
+        if (updatedAlbumResult.IsSuccess && updatedAlbumResult.Data != null)
+        {
+            var output = new AlbumOutputDto(updatedAlbumResult.Data);
+            return Ok(output);
+        }
         return NotFound(AlbumService.NOT_FOUND_ERROR_MESSAGE);
     }
 

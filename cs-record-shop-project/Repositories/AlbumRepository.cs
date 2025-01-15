@@ -1,4 +1,5 @@
 ﻿using cs_record_shop_project.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace cs_record_shop_project.Repositories;
 
@@ -12,24 +13,26 @@ public class AlbumRepository : IAlbumRepository
     }
     public List<Album> GetAllAlbums()
     {
-        return recordShopDb.Albums.ToList();
+        return recordShopDb.Albums.Include(a => a.Artist).ToList();
     }
 
-    public Album AddAlbum(AlbumDto albumDto)
+    public Album AddAlbum(AlbumInputDto albumDto)
     {
-        recordShopDb.Albums.Add(new Album(albumDto));
+        Album albumToAdd = new Album(albumDto);
+        recordShopDb.Albums.Add(albumToAdd);
         recordShopDb.SaveChanges();
-        return recordShopDb.Albums.Last();
+        var addedAlbum = recordShopDb.Albums.Include(a => a.Artist).OrderBy(a => a.Id).Last();
+        return addedAlbum;
     }
 
     public Album? GetAlbumById(int id)
     {
-        return recordShopDb.Albums.FirstOrDefault(album => album.Id == id);
+        return recordShopDb.Albums.Include(a => a.Artist).FirstOrDefault(album => album.Id == id);
     }
 
-    public Album? UpdateAlbum(int id, AlbumDto albumDto)
+    public Album? UpdateAlbum(int id, AlbumInputDto albumDto)
     {
-        var albumToUpdate = recordShopDb.Albums.FirstOrDefault(a => a.Id == id);
+        var albumToUpdate = recordShopDb.Albums.Include(a => a.Artist).FirstOrDefault(a => a.Id == id);
         if (albumToUpdate == null) return null;
         albumToUpdate.Title = albumDto.Title;
         albumToUpdate.Description = albumDto.Description;
@@ -39,7 +42,7 @@ public class AlbumRepository : IAlbumRepository
 
     public bool DeleteAlbum(int id)
     {
-        var albumToDelete = recordShopDb.Albums.FirstOrDefault(a =>a.Id == id); 
+        var albumToDelete = recordShopDb.Albums.Include(a => a.Artist).FirstOrDefault(a =>a.Id == id); 
         if(albumToDelete == null) return false;
         recordShopDb.Albums.Remove(albumToDelete);
         recordShopDb.SaveChanges();

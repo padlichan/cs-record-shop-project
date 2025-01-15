@@ -5,8 +5,8 @@ namespace cs_record_shop_project.Services;
 public interface IAlbumService
 {
     ServiceResult<List<Album>> GetAllAlbums();
-    ServiceResult<Album> AddAlbum(AlbumDto albumDto);    
+    ServiceResult<Album> AddAlbum(AlbumInputDto albumDto);    
     ServiceResult<Album> GetAlbumById(int id);
-    ServiceResult<Album> UpdateAlbum(int id, AlbumDto albumDto);
+    ServiceResult<Album> UpdateAlbum(int id, AlbumInputDto albumDto);
     ServiceResult<Album> DeleteAlbum(int id);
 }
