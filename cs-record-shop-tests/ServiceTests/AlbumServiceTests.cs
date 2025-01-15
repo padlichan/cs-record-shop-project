@@ -11,6 +11,9 @@ namespace cs_record_shop_tests.ServiceTests
         private AlbumService albumService;
         private Mock<IAlbumRepository> albumRepo;
         private Album album1 = new Album("testTitle", "testDescription");
+        private AlbumDto albumDto1 = new AlbumDto("testTitle", "testDescription");
+        private int validId = 1;
+        private int invalidId = 5;
 
         [SetUp]
         public void Setup()
@@ -60,9 +63,15 @@ namespace cs_record_shop_tests.ServiceTests
         }
 
         [Test]
+        public void GetAlbumById_CallsCorrectRepositoryMethod()
+        {
+            albumService.GetAlbumById(validId);
+            albumRepo.Verify(a => a.GetAlbumById(validId), Times.Once);
+        }
+
+        [Test]
         public void GetAlbumById_ReturnsCorrectAlbumForValidId()
         {
-            int validId = 1;
             albumRepo.Setup(a => a.GetAlbumById(validId)).Returns(album1);
 
             var result = albumService.GetAlbumById(validId);
@@ -74,7 +83,6 @@ namespace cs_record_shop_tests.ServiceTests
         [Test]
         public void GetAlbumById_ReturnsNullForInvalidId()
         {
-            int invalidId = 5;
             albumRepo.Setup(a => a.GetAlbumById(invalidId)).Returns<Album>(null!);
 
             var result = albumService.GetAlbumById(invalidId);
@@ -83,11 +91,48 @@ namespace cs_record_shop_tests.ServiceTests
             result.Data.Should().BeNull();
         }
 
+
+
         [Test]
-        public void GetAlbumById_CallsCorrectRepositoryMethod()
+        public void UpdateAlbum_CallsCorrectRepositoryMethod()
         {
-            albumService.GetAlbumById(1);
-            albumRepo.Verify(a => a.GetAlbumById(1), Times.Once);
+            albumRepo.Setup(a => a.UpdateAlbum(validId, albumDto1)).Returns(album1);
+
+            albumService.UpdateAlbum(validId, albumDto1);
+
+            albumRepo.Verify(a => a.UpdateAlbum(validId, albumDto1), Times.Once);
+        }
+
+        [Test]
+        public void UpdateAlbum_ReturnsSuccessForValidId()
+        {
+            albumRepo.Setup(a => a.UpdateAlbum(validId, albumDto1)).Returns(album1);
+
+            var result = albumService.UpdateAlbum(validId, albumDto1);
+
+            result.IsSuccess.Should().BeTrue();
+        }
+
+        [Test]
+        public void UpdateAlbum_ReturnsUpdatedAlbumForValidId()
+        {
+            Album updatedAlbum = new Album("updatedTitle", "updatedDescription");
+            albumRepo.Setup(a => a.UpdateAlbum(validId, albumDto1)).Returns(updatedAlbum);
+
+            var result = albumService.UpdateAlbum(validId, albumDto1);
+
+            result.Data.Should().BeEquivalentTo(updatedAlbum);
+        }
+
+        [Test]
+        public void UpdateAlbum_ReturnsErrorForInvalidId()
+        {
+            albumRepo.Setup(a => a.UpdateAlbum(invalidId, albumDto1)).Returns<Album?>(null!);
+
+            var result = albumService.UpdateAlbum(invalidId, albumDto1);
+
+            result.IsSuccess.Should().BeFalse();
+            result.Data.Should().BeNull();
         }
     }
 }

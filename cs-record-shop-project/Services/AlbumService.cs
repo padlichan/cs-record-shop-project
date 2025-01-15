@@ -33,6 +33,7 @@ public class AlbumService : IAlbumService
     public ServiceResult<Album?> UpdateAlbum(int id, AlbumDto albumDto)
     {
         var updatedAlbum = albumRepo.UpdateAlbum(id, albumDto);
-        return ServiceResult<Album?>.Success(new Album(albumDto));
+        if (updatedAlbum == null) return ServiceResult<Album?>.Error(NOT_FOUND_ERROR_MESSAGE);
+        return ServiceResult<Album?>.Success(updatedAlbum);
     }
 }

@@ -27,8 +27,13 @@ public class AlbumRepository : IAlbumRepository
         return recordShopDb.Albums.FirstOrDefault(album => album.Id == id);
     }
 
-    public object UpdateAlbum(int id, AlbumDto albumDto)
+    public Album? UpdateAlbum(int id, AlbumDto albumDto)
     {
-        return new Album(albumDto);
+        var albumToUpdate = recordShopDb.Albums.FirstOrDefault(a => a.Id == id);
+        if (albumToUpdate == null) return null;
+        albumToUpdate.Title = albumDto.Title;
+        albumToUpdate.Description = albumDto.Description;
+        recordShopDb.SaveChanges();
+        return albumToUpdate;
     }
 }
