@@ -30,9 +30,9 @@ public class AlbumService : IAlbumService
         return ServiceResult<Album?>.Success(album);
     }
 
-    public ServiceResult<Album?> UpdateAlbum(AlbumDto albumDto)
+    public ServiceResult<Album?> UpdateAlbum(int id, AlbumDto albumDto)
     {
-        var updatedAlbum = albumRepo.UpdateAlbum(albumDto);
+        var updatedAlbum = albumRepo.UpdateAlbum(id, albumDto);
         return ServiceResult<Album?>.Success(new Album(albumDto));
     }
 }

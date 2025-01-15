@@ -19,7 +19,7 @@ public class AlbumsController : ControllerBase
     public IActionResult GetAllAlbums()
     {
         var albums = albumService.GetAllAlbums();
-        return Ok(albums);
+        return Ok(albums.Data);
 
     }
 
@@ -29,23 +29,25 @@ public class AlbumsController : ControllerBase
     public IActionResult GetAlbumById(int id)
     {
         var AlbumByIdResult = albumService.GetAlbumById(id);
-        if(AlbumByIdResult.IsSuccess) return Ok(AlbumByIdResult.Data);
+        if (AlbumByIdResult.IsSuccess) return Ok(AlbumByIdResult.Data);
         return NotFound(AlbumByIdResult.ErrorMessage);
     }
 
     [HttpPost]
     public IActionResult PostAlbum(AlbumDto albumDto)
     {
-        var addedAlbum = albumService.AddAlbum(albumDto);
-        return Ok(addedAlbum);
+        var addedAlbumResult = albumService.AddAlbum(albumDto);
+        if (addedAlbumResult.IsSuccess) return Ok(addedAlbumResult.Data);
+        return BadRequest(addedAlbumResult.ErrorMessage);
+
+    }
+    [HttpPut]
+    [Route("{id}")]
+    public IActionResult PutAlbum(int id, AlbumDto albumDto)
+    {
+        var updatedAlbumResult = albumService.UpdateAlbum(id, albumDto);
+        if (updatedAlbumResult.IsSuccess) return Ok(updatedAlbumResult.Data);
+        return NotFound(AlbumService.NOT_FOUND_ERROR_MESSAGE);
     }
 
-    [HttpPost]
-    public IActionResult PutAlbum(AlbumDto albumDto)
-    {
-        var updatedAlbumResult = albumService.UpdateAlbum(albumDto);
-        if(updatedAlbumResult.IsSuccess) return Ok(updatedAlbumResult.Data);
-        return NotFound();
-    }
-    
 }

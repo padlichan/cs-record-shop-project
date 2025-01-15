@@ -32,7 +32,9 @@ namespace cs_record_shop_tests.ServiceTests
             List<Album> albums = [new Album("testTitle", "testDescription")];
             albumRepo.Setup(a => a.GetAllAlbums()).Returns(albums);
             var result = albumService.GetAllAlbums();
-            result.Should().BeEquivalentTo(albums);
+
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().BeEquivalentTo(albums);
 
         }
 
@@ -44,7 +46,8 @@ namespace cs_record_shop_tests.ServiceTests
 
             var result = albumService.AddAlbum(albumDto);
 
-            result.Should().BeEquivalentTo(album1);
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().BeEquivalentTo(album1);
         }
 
         [Test]
@@ -64,7 +67,8 @@ namespace cs_record_shop_tests.ServiceTests
 
             var result = albumService.GetAlbumById(validId);
 
-            result.Should().BeEquivalentTo(album1);
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().BeEquivalentTo(album1);
         }
 
         [Test]
@@ -75,7 +79,8 @@ namespace cs_record_shop_tests.ServiceTests
 
             var result = albumService.GetAlbumById(invalidId);
 
-            result.Should().BeNull();
+            result.IsSuccess.Should().BeFalse();
+            result.Data.Should().BeNull();
         }
 
         [Test]

@@ -5,6 +5,7 @@ using cs_record_shop_project.Models;
 using Moq;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using System.Security;
 
 namespace cs_record_shop_tests.ControllerTests
 {
@@ -25,6 +26,8 @@ namespace cs_record_shop_tests.ControllerTests
         [Test]
         public void AlbumsController_CallsCorrectServiceMethod()
         {
+            List<Album> albums = [album1];
+            albumService.Setup(a => a.GetAllAlbums()).Returns(ServiceResult<List<Album>>.Success(albums));
             albumsController.GetAllAlbums();
             albumService.Verify(m => m.GetAllAlbums(), Times.Once);
         }
@@ -37,10 +40,11 @@ namespace cs_record_shop_tests.ControllerTests
             albumService.Setup(m => m.GetAllAlbums()).Returns(ServiceResult<List<Album>>.Success(albums));
 
             //Act
-            var ObjectResult = albumsController.GetAllAlbums() as OkObjectResult;
-            var result = ObjectResult?.Value as List<Album>;
+            var ObjectResult = albumsController.GetAllAlbums();
+            var result = ((OkObjectResult)ObjectResult)?.Value as List<Album>;
 
             //Assert
+            ObjectResult.Should().BeOfType<OkObjectResult>();
             result.Should().BeEquivalentTo(albums);
         }
 
@@ -62,6 +66,7 @@ namespace cs_record_shop_tests.ControllerTests
         [Test]
         public void PostAlbum_CallsCorrectServiceMethod()
         {
+            albumService.Setup(a => a.AddAlbum(albumDto1)).Returns(ServiceResult<Album>.Success(album1));
             albumsController.PostAlbum(albumDto1);
             albumService.Verify(a => a.AddAlbum(albumDto1), Times.Once);
         }
@@ -69,6 +74,7 @@ namespace cs_record_shop_tests.ControllerTests
         [Test]
         public void PostAlbum_ReturnOkObjectResultForValidAlbum()
         {
+            albumService.Setup(a => a.AddAlbum(albumDto1)).Returns(ServiceResult<Album>.Success(album1));
             var result = albumsController.PostAlbum(albumDto1);
             result.Should().BeOfType<OkObjectResult>();
         }
@@ -85,9 +91,11 @@ namespace cs_record_shop_tests.ControllerTests
         [Test]
         public void GetAlbumById_CallsCorrectServiceMethod()
         {
-            albumsController.GetAlbumById(1);
+            int validId = 1;
+            albumService.Setup(a => a.GetAlbumById(validId)).Returns(ServiceResult<Album?>.Success(album1));
+            albumsController.GetAlbumById(validId);
 
-            albumService.Verify(a => a.GetAlbumById(1), Times.Once());
+            albumService.Verify(a => a.GetAlbumById(validId), Times.Once());
         }
 
         [Test]
@@ -117,9 +125,66 @@ namespace cs_record_shop_tests.ControllerTests
             albumService.Setup(a => a.GetAlbumById(invalidId)).Returns(serviceReturnValue);
             var result = albumsController.GetAlbumById(invalidId);
 
-            result.Should().BeOfType<NotFoundResult>();
+            result.Should().BeOfType<NotFoundObjectResult>();
         }
 
+        [Test]
+
+        public void UpdateAlbum_CallsCorrectServiceMethod()
+        {
+            AlbumDto newAlbumDto = new AlbumDto("newTitle", "newDescription");
+            Album updatedAlbum = new Album("newTitle", "newDescription");
+            int validId = 1;
+            albumService.Setup(a => a.UpdateAlbum(validId, newAlbumDto))
+                                     .Returns(ServiceResult<Album?>.Success(updatedAlbum));
+
+
+            albumsController.PutAlbum(validId, newAlbumDto);
+
+            albumService.Verify(a => a.UpdateAlbum(validId, newAlbumDto), Times.Once);
+        }
+        [Test]
+        public void UpdateAlbum_ReturnsUpdatedAlbumForValidId()
+        {
+            AlbumDto newAlbumDto = new AlbumDto("newTitle", "newDescription");
+            Album updatedAlbum = new Album("newTitle", "newDescription");
+            int validId = 1;
+            albumService.Setup(a => a.UpdateAlbum(validId, newAlbumDto))
+                        .Returns(ServiceResult<Album?>.Success(updatedAlbum));
+
+
+            var result = albumsController.PutAlbum(validId, newAlbumDto) as OkObjectResult;
+            result.Should().NotBeNull();
+            result.Value.Should().BeEquivalentTo(updatedAlbum);
+        }
+
+        [Test]
+        public void UpdateAlbum_ReturnsOkObjectResultForValidId()
+        {
+            AlbumDto newAlbumDto = new AlbumDto("newTitle", "newDescription");
+            Album updatedAlbum = new Album("newTitle", "newDescription");
+            int validId = 1;
+            albumService.Setup(a => a.UpdateAlbum(validId, newAlbumDto))
+                        .Returns(ServiceResult<Album?>.Success(updatedAlbum));
+
+            var result = albumsController.PutAlbum(validId, newAlbumDto);
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
         
+        [Test]
+        public void UpdateAlbum_ReturnsNotFoundForInvalidId()
+        {
+            AlbumDto newAlbumDto = new AlbumDto("newTitle", "newDescription");
+            Album updatedAlbum = new Album("newTitle", "newDescription");
+            int invalidId = 5;
+            albumService.Setup(a => a.UpdateAlbum(invalidId, newAlbumDto))
+                        .Returns(ServiceResult<Album?>.Error(AlbumService.NOT_FOUND_ERROR_MESSAGE));
+
+            var result = albumsController.PutAlbum(invalidId, newAlbumDto);
+
+            result.Should().BeOfType<NotFoundObjectResult>();
+        }
+
     }
 }

@@ -7,5 +7,5 @@ public interface IAlbumService
     ServiceResult<List<Album>> GetAllAlbums();
     ServiceResult<Album> AddAlbum(AlbumDto albumDto);    
     ServiceResult<Album?> GetAlbumById(int id);
-    ServiceResult<Album?> UpdateAlbum(AlbumDto albumDto);
+    ServiceResult<Album?> UpdateAlbum(int id, AlbumDto albumDto);
 }
