@@ -5,12 +5,12 @@ namespace cs_record_shop_project.Models;
 
 public class AlbumInputDto
 {
-    public AlbumInputDto(string title, string description, int year, int artistId)
+    public AlbumInputDto(string title, int year, string artistName, string description = "")
     {
         Title = title;
         Description = description;
         Year = year;
-        ArtistId = artistId;
+        ArtistName = artistName;
     }
 
     [Required]
@@ -18,14 +18,13 @@ public class AlbumInputDto
     public string Title { get; set; }
 
     [Required]
-    [JsonPropertyName("description")]
-    public string Description { get; set; }
-
-    [Required]
     [JsonPropertyName("year")]
     public int Year { get; set; }
 
     [Required]
-    [JsonPropertyName("artistId")]
-    public int ArtistId { get; set; }
+    [JsonPropertyName("artistName")]
+    public string ArtistName { get; set; }
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; }
 }

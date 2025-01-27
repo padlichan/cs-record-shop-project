@@ -1,7 +1,6 @@
-﻿using cs_record_shop_project.Services;
-using cs_record_shop_project.Models;
+﻿using cs_record_shop_project.Models;
+using cs_record_shop_project.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
 
 namespace cs_record_shop_project.Controllers;
 
@@ -64,7 +63,7 @@ public class AlbumsController : ControllerBase
             var output = new AlbumOutputDto(updatedAlbumResult.Data);
             return Ok(output);
         }
-        return NotFound(AlbumService.NOT_FOUND_ERROR_MESSAGE);
+        return NotFound(updatedAlbumResult.ErrorMessage);
     }
 
     [HttpDelete]
@@ -72,7 +71,7 @@ public class AlbumsController : ControllerBase
     public IActionResult DeleteAlbum(int id)
     {
         ServiceResult<Album> deletedAlbumResult = albumService.DeleteAlbum(id);
-        if(deletedAlbumResult.IsSuccess) return NoContent();
+        if (deletedAlbumResult.IsSuccess) return NoContent();
         else return NotFound(deletedAlbumResult.ErrorMessage);
     }
 }

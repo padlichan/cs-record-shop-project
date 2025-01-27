@@ -10,14 +10,14 @@ public class Album
     public int ArtistId { get; set; }
     public int Year { get; set; }
     public string Description { get; set; }
-    public Artist Artist { get; set; }
+    public Artist? Artist { get; set; }
 
-    public Album(AlbumInputDto albumDto)
+    public Album(AlbumInputDto albumDto, int artistId)
     {
         Title = albumDto.Title;
         Description = albumDto.Description;
-        ArtistId = albumDto.ArtistId;
-        Year = albumDto.Year;        
+        ArtistId = artistId;
+        Year = albumDto.Year;
     }
 
     public Album(int id, string title, int artistId, int year, string description)

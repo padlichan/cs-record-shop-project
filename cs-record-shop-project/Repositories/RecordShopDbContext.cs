@@ -14,9 +14,9 @@ public class RecordShopDbContext : DbContext
 
         modelBuilder.Entity<Artist>().HasData
         (
-            new Artist { Id = 1, Name = "Artist1" },
-            new Artist { Id = 2, Name = "Artist2" },
-            new Artist { Id = 3, Name = "Artist3" }
+            new Artist(1, "Artist1"),
+            new Artist(2, "Artist2"),
+            new Artist(3, "Artist3")
         );
     }
 }

@@ -1,10 +1,9 @@
-﻿using cs_record_shop_project;
-using cs_record_shop_project.Controllers;
-using cs_record_shop_project.Services;
+﻿using cs_record_shop_project.Controllers;
 using cs_record_shop_project.Models;
-using Moq;
+using cs_record_shop_project.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 
 namespace cs_record_shop_tests.ControllerTests;
 
@@ -12,18 +11,25 @@ internal class AlbumsControllerTests
 {
     private AlbumsController albumsController;
     private Mock<IAlbumService> albumService;
-    private AlbumInputDto albumInputDto1 = new AlbumInputDto("testTitle", "testDescription", 2000, 1);
-    AlbumInputDto newAlbumInputDto = new AlbumInputDto("newTitle", "newDescription", 2000, 1);
-    private Album album1;
+    private string validArtistName = "Artist";
+    private string validDescription = "description";
+    private AlbumInputDto albumInputDto;
+    AlbumInputDto newAlbumInputDto;
+    private Album album;
     Album updatedAlbum;
     private int validId = 1;
     private int invalidId = 5;
+    private int validArtistId = 1;
+    private int invalidArtistId = 5;
 
-    [SetUp] 
+    [SetUp]
     public void Setup()
     {
-        updatedAlbum = new Album(newAlbumInputDto);
-        album1 = new Album(albumInputDto1);
+        albumInputDto = new AlbumInputDto("testTitle", 2000, validArtistName, "testDescription");
+        newAlbumInputDto = new AlbumInputDto("newTitle", 2000, validArtistName, validDescription);
+
+        updatedAlbum = new Album(newAlbumInputDto, validId);
+        album = new Album(albumInputDto, validId);
         albumService = new Mock<IAlbumService>();
         albumsController = new AlbumsController(albumService.Object);
     }
@@ -31,7 +37,7 @@ internal class AlbumsControllerTests
     [Test]
     public void GetAllAlbums_CallsCorrectServiceMethod()
     {
-        List<Album> albums = [album1];
+        List<Album> albums = [album];
         albumService.Setup(a => a.GetAllAlbums()).Returns(ServiceResult<List<Album>>.Success(albums));
         albumsController.GetAllAlbums();
         albumService.Verify(m => m.GetAllAlbums(), Times.Once);
@@ -41,7 +47,7 @@ internal class AlbumsControllerTests
     public void GetAllAlbums_ReturnsCorrectAlbums()
     {
         //Assign
-        List<Album> albums = [album1];
+        List<Album> albums = [album];
         var expectedResult = albums.Select(a => new AlbumOutputDto(a)).ToList();
         albumService.Setup(m => m.GetAllAlbums()).Returns(ServiceResult<List<Album>>.Success(albums));
 
@@ -58,12 +64,12 @@ internal class AlbumsControllerTests
     public void GetAllAlbums_ReturnsOkObjectResult()
     {
         //Assign
-        List<Album> albums = [album1];
+        List<Album> albums = [album];
         albumService.Setup(m => m.GetAllAlbums()).Returns(ServiceResult<List<Album>>.Success(albums));
 
         //Act
         var result = albumsController.GetAllAlbums() as OkObjectResult;
-        
+
 
         //Assert
         result.Should().NotBeNull();
@@ -72,25 +78,25 @@ internal class AlbumsControllerTests
     [Test]
     public void PostAlbum_CallsCorrectServiceMethod()
     {
-        albumService.Setup(a => a.AddAlbum(albumInputDto1)).Returns(ServiceResult<Album>.Success(album1));
-        albumsController.PostAlbum(albumInputDto1);
-        albumService.Verify(a => a.AddAlbum(albumInputDto1), Times.Once);
+        albumService.Setup(a => a.AddAlbum(albumInputDto)).Returns(ServiceResult<Album>.Success(album));
+        albumsController.PostAlbum(albumInputDto);
+        albumService.Verify(a => a.AddAlbum(albumInputDto), Times.Once);
     }
 
     [Test]
     public void PostAlbum_ReturnOkObjectResultForValidAlbum()
     {
-        albumService.Setup(a => a.AddAlbum(albumInputDto1)).Returns(ServiceResult<Album>.Success(album1));
-        var result = albumsController.PostAlbum(albumInputDto1);
+        albumService.Setup(a => a.AddAlbum(albumInputDto)).Returns(ServiceResult<Album>.Success(album));
+        var result = albumsController.PostAlbum(albumInputDto);
         result.Should().BeOfType<OkObjectResult>();
     }
 
     [Test]
     public void PostAlbum_ReturnsAddedAlbum()
     {
-        var expectedResult = new AlbumOutputDto(album1); 
-        albumService.Setup(a => a.AddAlbum(albumInputDto1)).Returns(ServiceResult<Album>.Success(album1));
-        var resultObject = albumsController.PostAlbum(albumInputDto1) as OkObjectResult;
+        var expectedResult = new AlbumOutputDto(album);
+        albumService.Setup(a => a.AddAlbum(albumInputDto)).Returns(ServiceResult<Album>.Success(album));
+        var resultObject = albumsController.PostAlbum(albumInputDto) as OkObjectResult;
         var result = resultObject?.Value;
         result.Should().BeEquivalentTo(expectedResult);
     }
@@ -98,7 +104,7 @@ internal class AlbumsControllerTests
     [Test]
     public void GetAlbumById_CallsCorrectServiceMethod()
     {
-        albumService.Setup(a => a.GetAlbumById(validId)).Returns(ServiceResult<Album>.Success(album1));
+        albumService.Setup(a => a.GetAlbumById(validId)).Returns(ServiceResult<Album>.Success(album));
         albumsController.GetAlbumById(validId);
 
         albumService.Verify(a => a.GetAlbumById(validId), Times.Once());
@@ -107,8 +113,8 @@ internal class AlbumsControllerTests
     [Test]
     public void GetAlbumById_ReturnsCorrectAlbumForValidId()
     {
-        albumService.Setup(a => a.GetAlbumById(1)).Returns(ServiceResult<Album>.Success(album1));
-        var expectedResult = new AlbumOutputDto(album1);
+        albumService.Setup(a => a.GetAlbumById(1)).Returns(ServiceResult<Album>.Success(album));
+        var expectedResult = new AlbumOutputDto(album);
 
         var resultObject = albumsController.GetAlbumById(1) as OkObjectResult;
         var result = resultObject?.Value;
@@ -118,7 +124,7 @@ internal class AlbumsControllerTests
     [Test]
     public void GetAlbumById_ReturnsOkObjectResultForValidId()
     {
-        albumService.Setup(a => a.GetAlbumById(validId)).Returns(ServiceResult<Album>.Success(album1));
+        albumService.Setup(a => a.GetAlbumById(validId)).Returns(ServiceResult<Album>.Success(album));
 
         var result = albumsController.GetAlbumById(validId);
         result.Should().BeOfType<OkObjectResult>();
@@ -168,7 +174,7 @@ internal class AlbumsControllerTests
 
         result.Should().BeOfType<OkObjectResult>();
     }
-    
+
     [Test]
     public void UpdateAlbum_ReturnsNotFoundForInvalidId()
     {
