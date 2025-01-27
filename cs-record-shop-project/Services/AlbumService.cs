@@ -1,5 +1,5 @@
-﻿using cs_record_shop_project.Repositories;
-using cs_record_shop_project.Models;
+﻿using cs_record_shop_project.Models;
+using cs_record_shop_project.Repositories;
 
 namespace cs_record_shop_project.Services;
 
@@ -8,10 +8,12 @@ public class AlbumService : IAlbumService
     public const string NOT_FOUND_ERROR_MESSAGE = "Album not found.";
     public const string INVALID_ARTIST_ERROR_MESSAGE = "Invalid artist id.";
     private IAlbumRepository albumRepo;
+    private IArtistRepository artistRepo;
 
-    public AlbumService(IAlbumRepository albumRepo)
+    public AlbumService(IAlbumRepository albumRepo, IArtistRepository artistRepo)
     {
         this.albumRepo = albumRepo;
+        this.artistRepo = artistRepo;
     }
 
     public ServiceResult<List<Album>> GetAllAlbums()
@@ -21,7 +23,7 @@ public class AlbumService : IAlbumService
 
     public ServiceResult<Album> AddAlbum(AlbumInputDto albumDto)
     {
-        //TO DO: Check if artist id is valid
+        if (!artistRepo.IsValidArtist(albumDto.ArtistId)) return ServiceResult<Album>.Error(INVALID_ARTIST_ERROR_MESSAGE);
         Album albumAdded = albumRepo.AddAlbum(albumDto);
         if (albumAdded == null) return ServiceResult<Album>.Error("Album cannot be added.");
         return ServiceResult<Album>.Success(albumAdded);
@@ -37,6 +39,7 @@ public class AlbumService : IAlbumService
 
     public ServiceResult<Album> UpdateAlbum(int id, AlbumInputDto albumDto)
     {
+        if (!artistRepo.IsValidArtist(albumDto.ArtistId)) return ServiceResult<Album>.Error(INVALID_ARTIST_ERROR_MESSAGE);
         var updatedAlbum = albumRepo.UpdateAlbum(id, albumDto);
         if (updatedAlbum == null) return ServiceResult<Album>.Error(NOT_FOUND_ERROR_MESSAGE);
         return ServiceResult<Album>.Success(updatedAlbum);

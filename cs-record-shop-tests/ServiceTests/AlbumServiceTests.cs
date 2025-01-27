@@ -1,8 +1,8 @@
-﻿using cs_record_shop_project.Repositories;
-using Moq;
+﻿using cs_record_shop_project.Models;
+using cs_record_shop_project.Repositories;
 using cs_record_shop_project.Services;
-using cs_record_shop_project.Models;
 using FluentAssertions;
+using Moq;
 
 namespace cs_record_shop_tests.ServiceTests;
 
@@ -10,6 +10,7 @@ internal class AlbumServiceTests
 {
     private AlbumService albumService;
     private Mock<IAlbumRepository> albumRepo;
+    private Mock<IArtistRepository> artistRepo;
     private AlbumInputDto albumInputDto1 = new AlbumInputDto("testTitle", "testDescription", 2000, 1);
     AlbumInputDto newAlbumInputDto = new AlbumInputDto("newTitle", "newDescription", 2000, 1);
     private Album album1;
@@ -23,7 +24,8 @@ internal class AlbumServiceTests
         updatedAlbum = new Album(newAlbumInputDto);
         album1 = new Album(albumInputDto1);
         albumRepo = new Mock<IAlbumRepository>();
-        albumService = new AlbumService(albumRepo.Object);
+        artistRepo = new Mock<IArtistRepository>();
+        albumService = new AlbumService(albumRepo.Object, artistRepo.Object);
     }
 
     [Test]
@@ -48,8 +50,9 @@ internal class AlbumServiceTests
     [Test]
     public void AddAlbum_ReturnsAddedAlbum()
     {
-        
+
         albumRepo.Setup(a => a.AddAlbum(albumInputDto1)).Returns(album1);
+        artistRepo.Setup(a => a.IsValidArtist(albumInputDto1.ArtistId)).Returns(true);
 
         var result = albumService.AddAlbum(albumInputDto1);
 
@@ -60,10 +63,13 @@ internal class AlbumServiceTests
     [Test]
     public void AddAlbum_CallsCorrectRepositoryMethod()
     {
+        artistRepo.Setup(a => a.IsValidArtist(albumInputDto1.ArtistId)).Returns(true);
         var result = albumService.AddAlbum(albumInputDto1);
 
         albumRepo.Verify(a => a.AddAlbum(albumInputDto1), Times.Once);
     }
+
+    //TO DO: Tests for invalid artist ID
 
     [Test]
     public void GetAlbumById_CallsCorrectRepositoryMethod()
@@ -100,6 +106,7 @@ internal class AlbumServiceTests
     public void UpdateAlbum_CallsCorrectRepositoryMethod()
     {
         albumRepo.Setup(a => a.UpdateAlbum(validId, albumInputDto1)).Returns(album1);
+        artistRepo.Setup(a => a.IsValidArtist(albumInputDto1.ArtistId)).Returns(true);
 
         albumService.UpdateAlbum(validId, albumInputDto1);
 
@@ -110,6 +117,7 @@ internal class AlbumServiceTests
     public void UpdateAlbum_ReturnsSuccessForValidId()
     {
         albumRepo.Setup(a => a.UpdateAlbum(validId, albumInputDto1)).Returns(album1);
+        artistRepo.Setup(a => a.IsValidArtist(albumInputDto1.ArtistId)).Returns(true);
 
         var result = albumService.UpdateAlbum(validId, albumInputDto1);
 
@@ -120,6 +128,7 @@ internal class AlbumServiceTests
     public void UpdateAlbum_ReturnsUpdatedAlbumForValidId()
     {
         albumRepo.Setup(a => a.UpdateAlbum(validId, newAlbumInputDto)).Returns(updatedAlbum);
+        artistRepo.Setup(a => a.IsValidArtist(albumInputDto1.ArtistId)).Returns(true);
 
         var result = albumService.UpdateAlbum(validId, newAlbumInputDto);
 
@@ -136,6 +145,8 @@ internal class AlbumServiceTests
         result.IsSuccess.Should().BeFalse();
         result.Data.Should().BeNull();
     }
+
+    //TO DO: Tests for invalid artist ID
 
     [Test]
     public void DeleteAlbum_CallsCorrectRepositoryMethod()
@@ -166,4 +177,6 @@ internal class AlbumServiceTests
 
         result.IsSuccess.Should().BeFalse();
     }
+
+
 }

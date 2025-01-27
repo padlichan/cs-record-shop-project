@@ -15,10 +15,10 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-if(builder.Environment.IsDevelopment())
+if (builder.Environment.IsDevelopment())
 {
     //builder.Services.AddDbContext<RecordShopDbContext>(options => options.UseInMemoryDatabase("InMemoryDb"));
-    var connectionString = builder.Configuration.GetConnectionString("RecordShopDatabase");
+    var connectionString = builder.Configuration.GetConnectionString("RSDB");
     builder.Services.AddDbContext<RecordShopDbContext>(options => options.UseSqlServer(connectionString));
 }
 else
@@ -30,6 +30,8 @@ else
 
 builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
+builder.Services.AddScoped<IArtistRepository, ArtistRepository>();
+builder.Services.AddScoped<IArtistService, ArtistService>();
 
 var app = builder.Build();
 
