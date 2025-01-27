@@ -35,6 +35,7 @@ public class AlbumRepository : IAlbumRepository
         var albumToUpdate = recordShopDb.Albums.Include(a => a.Artist).FirstOrDefault(a => a.Id == id);
         if (albumToUpdate == null) return null;
         albumToUpdate.Title = albumDto.Title;
+        albumToUpdate.Year = albumDto.Year;
         albumToUpdate.Description = albumDto.Description;
         albumToUpdate.ArtistId = artistId;
         recordShopDb.SaveChanges();
